@@ -4,6 +4,7 @@ import { resolve } from 'path';
 import { defineConfig } from 'vite';
 import dts from 'vite-plugin-dts';
 import tsconfigPaths from 'vite-tsconfig-paths';
+import pkg from './package.json';
 
 function cleanImagesDir() {
   return {
@@ -24,7 +25,9 @@ function cleanImagesDir() {
 export default defineConfig({
   plugins: [
     react(),
-    tsconfigPaths(),
+    tsconfigPaths({
+      projects: [resolve(__dirname, 'tsconfig.lib.json')],
+    }),
     dts({
       include: ['./src/'],
     }),
@@ -44,7 +47,12 @@ export default defineConfig({
       },
     },
     rollupOptions: {
-      external: /node_modules/,
+      external: [
+        ...Object.keys(pkg.dependencies),
+        ...Object.keys(pkg.peerDependencies),
+        'react/jsx-runtime',
+        /react-icons/
+      ],
       output: {
         preserveModules: true,
       },
