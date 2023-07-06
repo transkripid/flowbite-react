@@ -33,7 +33,7 @@ export default defineConfig({
   build: {
     sourcemap: true,
     outDir: 'lib',
-    minify: false,
+    minify: true,
     lib: {
       formats: ['es', 'cjs'],
       entry: resolve(__dirname, 'src/index.ts'),
