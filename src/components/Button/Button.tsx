@@ -1,5 +1,7 @@
-import { createElement, forwardRef, type ComponentProps, type ElementType, type ReactNode } from 'react';
+import type { ComponentPropsWithoutRef, ElementType, ForwardedRef } from 'react';
+import { type ReactNode } from 'react';
 import { twMerge } from 'tailwind-merge';
+import genericForwardRef from '~/src/helpers/generic-forward-ref';
 import type {
   DeepPartial,
   FlowbiteBoolean,
@@ -10,6 +12,7 @@ import type {
 } from '../../';
 import { Spinner, useTheme } from '../../';
 import { mergeDeep } from '../../helpers/merge-deep';
+import { ButtonBase, type ButtonBaseProps } from './ButtonBase';
 import type { PositionInButtonGroup } from './ButtonGroup';
 import ButtonGroup from './ButtonGroup';
 
@@ -20,6 +23,7 @@ export interface FlowbiteButtonTheme {
   disabled: string;
   isProcessing: string;
   spinnerSlot: string;
+  spinnerLeftPosition: ButtonSizes;
   gradient: ButtonGradientColors;
   gradientDuoTone: ButtonGradientDuoToneColors;
   inner: FlowbiteButtonInnerTheme;
@@ -33,6 +37,7 @@ export interface FlowbiteButtonInnerTheme {
   base: string;
   position: PositionInButtonGroup;
   outline: string;
+  isProcessingPadding: ButtonSizes;
 }
 
 export interface FlowbiteButtonOutlineTheme extends FlowbiteBoolean {
@@ -61,13 +66,13 @@ export interface ButtonSizes extends Pick<FlowbiteSizes, 'xs' | 'sm' | 'lg' | 'x
   [key: string]: string;
 }
 
-export interface ButtonProps extends Omit<ComponentProps<'button'>, 'color' | 'ref'> {
+export type ButtonProps<T extends ElementType = 'button'> = {
+  as?: T;
+  href?: string;
   color?: keyof FlowbiteColors;
   fullSized?: boolean;
   gradientDuoTone?: keyof ButtonGradientDuoToneColors;
   gradientMonochrome?: keyof ButtonGradientColors;
-  as?: ElementType;
-  href?: string;
   target?: string;
   isProcessing?: boolean;
   processingLabel?: string;
@@ -78,63 +83,53 @@ export interface ButtonProps extends Omit<ComponentProps<'button'>, 'color' | 'r
   positionInGroup?: keyof PositionInButtonGroup;
   size?: keyof ButtonSizes;
   theme?: DeepPartial<FlowbiteButtonTheme>;
-}
+} & ComponentPropsWithoutRef<T>;
 
-interface Props extends ButtonProps, Record<string, unknown> {}
+const ButtonComponentFn = <T extends ElementType = 'button'>(
+  {
+    children,
+    className,
+    color = 'info',
+    disabled,
+    fullSized,
+    isProcessing = false,
+    processingLabel = 'Loading...',
+    processingSpinner,
+    gradientDuoTone,
+    gradientMonochrome,
+    label,
+    outline = false,
+    pill = false,
+    positionInGroup = 'none',
+    size = 'md',
+    theme: customTheme = {},
+    ...props
+  }: ButtonProps<T>,
+  ref: ForwardedRef<T>,
+) => {
+  const { buttonGroup: groupTheme, button: buttonTheme } = useTheme().theme;
+  const theme = mergeDeep(buttonTheme, customTheme);
 
-const ButtonComponent = forwardRef<HTMLButtonElement | HTMLAnchorElement, Props>(
-  (
-    {
-      children,
-      className,
-      color = 'info',
-      disabled = false,
-      fullSized,
-      isProcessing = false,
-      processingLabel = 'Loading...',
-      processingSpinner: SpinnerComponent = <Spinner />,
-      gradientDuoTone,
-      gradientMonochrome,
-      as: Component = 'button',
-      href,
-      label,
-      outline = false,
-      pill = false,
-      positionInGroup = 'none',
-      size = 'md',
-      theme: customTheme = {},
-      ...props
-    },
-    ref,
-  ) => {
-    const { buttonGroup: groupTheme, button: buttonTheme } = useTheme().theme;
-    const theme = mergeDeep(buttonTheme, customTheme);
+  const theirProps = props as ButtonBaseProps<T>;
 
-    const BaseComponent = href ? 'a' : Component ?? 'button';
-
-    const theirProps = props as object;
-
-    return createElement(
-      BaseComponent,
-      {
-        disabled,
-        href,
-        type: Component === 'button' ? 'button' : undefined,
-        ref: ref as never,
-        className: twMerge(
-          theme.base,
-          disabled && theme.disabled,
-          !gradientDuoTone && !gradientMonochrome && theme.color[color],
-          gradientDuoTone && !gradientMonochrome && theme.gradientDuoTone[gradientDuoTone],
-          !gradientDuoTone && gradientMonochrome && theme.gradient[gradientMonochrome],
-          outline && (theme.outline.color[color] ?? theme.outline.color.default),
-          theme.pill[pill ? 'on' : 'off'],
-          fullSized && theme.fullSized,
-          groupTheme.position[positionInGroup],
-          className,
-        ),
-        ...theirProps,
-      },
+  return (
+    <ButtonBase
+      ref={ref}
+      disabled={disabled}
+      className={twMerge(
+        theme.base,
+        disabled && theme.disabled,
+        !gradientDuoTone && !gradientMonochrome && theme.color[color],
+        gradientDuoTone && !gradientMonochrome && theme.gradientDuoTone[gradientDuoTone],
+        !gradientDuoTone && gradientMonochrome && theme.gradient[gradientMonochrome],
+        outline && (theme.outline.color[color] ?? theme.outline.color.default),
+        theme.pill[pill ? 'on' : 'off'],
+        fullSized && theme.fullSized,
+        groupTheme.position[positionInGroup],
+        className,
+      )}
+      {...theirProps}
+    >
       <span
         className={twMerge(
           theme.inner.base,
@@ -143,11 +138,16 @@ const ButtonComponent = forwardRef<HTMLButtonElement | HTMLAnchorElement, Props>
           theme.size[size],
           outline && !theme.outline.color[color] && theme.inner.outline,
           isProcessing && theme.isProcessing,
+          isProcessing && theme.inner.isProcessingPadding[size],
           theme.inner.position[positionInGroup],
         )}
       >
         <>
-          {isProcessing && <span className={twMerge(theme.spinnerSlot)}>{SpinnerComponent}</span>}
+          {isProcessing && (
+            <span className={twMerge(theme.spinnerSlot, theme.spinnerLeftPosition[size])}>
+              {processingSpinner || <Spinner size={size} />}
+            </span>
+          )}
           {typeof children !== 'undefined' ? (
             children
           ) : (
@@ -156,12 +156,15 @@ const ButtonComponent = forwardRef<HTMLButtonElement | HTMLAnchorElement, Props>
             </span>
           )}
         </>
-      </span>,
-    );
-  },
-);
+      </span>
+    </ButtonBase>
+  );
+};
 
-ButtonComponent.displayName = 'Button';
+ButtonComponentFn.displayName = 'Button';
+
+const ButtonComponent = genericForwardRef(ButtonComponentFn);
+
 export const Button = Object.assign(ButtonComponent, {
   Group: ButtonGroup,
 });

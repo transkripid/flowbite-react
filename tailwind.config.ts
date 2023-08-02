@@ -1,6 +1,7 @@
-/** @type {import('tailwindcss').Config} */
-module.exports = {
-  content: ['./app/**/*.{js,jsx,md,mdx,ts,tsx}', './src/**/*.{js,jsx,ts,tsx}'],
+import { type Config } from 'tailwindcss';
+
+const config: Config = {
+  content: ['./app/**/*.{js,jsx,md,mdx,ts,tsx}', './src/**/*.{js,jsx,ts,tsx}', './mdx-components.tsx'],
   plugins: [require('flowbite/plugin')],
   theme: {
     extend: {
@@ -20,6 +21,15 @@ module.exports = {
       },
       maxWidth: {
         '8xl': '90rem',
+      },
+      keyframes: {
+        fadeIn: {
+          '0%': { opacity: '0' },
+          '100%': { opacity: '1' },
+        },
+      },
+      animation: {
+        'fade-in': 'fadeIn 200ms ease-in-out',
       },
     },
     fontFamily: {
@@ -72,3 +82,5 @@ module.exports = {
     },
   },
 };
+
+export default config;

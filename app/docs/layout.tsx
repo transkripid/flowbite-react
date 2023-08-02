@@ -29,6 +29,7 @@ interface DocsLayoutState {
 const DocsLayout: NextPage<PropsWithChildren> = ({ children }) => {
   const pathname = usePathname();
   const [isCollapsed, setCollapsed] = useState(true);
+  const [tableOfContents, setTableOfContents] = useState('');
 
   const state: DocsLayoutState = {
     isCollapsed,
@@ -36,8 +37,12 @@ const DocsLayout: NextPage<PropsWithChildren> = ({ children }) => {
   };
 
   useEffect(() => {
-    // start syntax highlighting once the page is mounted
+    // syntax-highlight on each re-render, since user may interact with the page
     prism.highlightAll();
+
+    // update client-rendered Table of Contents on each new page
+    const toc = document.querySelector('#table-of-contents + ul')?.innerHTML;
+    setTableOfContents(toc ?? '');
   }, [pathname]);
 
   useEffect(() => {
@@ -46,41 +51,34 @@ const DocsLayout: NextPage<PropsWithChildren> = ({ children }) => {
 
   return (
     <Flowbite>
-      <main className="w-full min-w-0 flex-auto lg:static lg:max-h-full lg:overflow-visible">
+      <div className="w-full min-w-0 flex-auto lg:static lg:max-h-full lg:overflow-visible">
         <div className="relative max-h-screen w-full overflow-auto bg-white text-gray-600 antialiased dark:bg-gray-900 dark:text-gray-400">
           <DocsNavbar {...state} />
           <div className="lg:flex">
             <DocsSidebar {...state} />
-            <div className="flex w-full">
-              <div className="pb:12 mx-auto flex w-full min-w-0 max-w-4xl flex-col px-4 pt-6 lg:px-8 lg:pb-16 lg:pt-8 xl:pb-24">
-                <div id="mainContent">{children}</div>
-                <DocsFooter />
-              </div>
-              <div className="right-0 hidden w-64 flex-none pl-8 xl:block xl:text-sm">
-                <div className="sticky top-20 flex h-[calc(100vh-5rem)] flex-col justify-between overflow-y-auto pb-6">
-                  <div className="mb-8">
-                    <h4 className="my-4 pl-2.5 text-sm font-semibold uppercase tracking-wide text-gray-900 dark:text-white">
-                      On this page
-                    </h4>
-                    <nav>
-                      <ul className="space-y-2.5 overflow-x-hidden font-medium text-gray-500 dark:text-gray-400">
-                        <li>
-                          <a
-                            href="#"
-                            className='inline-block border-l border-white pl-2.5 transition-none duration-200 after:ml-2 after:text-cyan-700 after:opacity-0 after:transition-opacity after:duration-100 after:content-["#"] hover:border-gray-300 hover:text-gray-900 hover:after:opacity-100 dark:border-gray-900 dark:after:text-cyan-700 dark:hover:border-gray-700 dark:hover:text-white'
-                          >
-                            Getting started
-                          </a>
-                        </li>
-                      </ul>
-                    </nav>
+            <div className="w-full min-w-0 flex-auto lg:static lg:max-h-full lg:overflow-visible">
+              <div className="flex w-full">
+                <div className="pb:12 mx-auto flex min-w-0 max-w-4xl flex-col divide-y divide-gray-200 px-4 pt-6 dark:divide-gray-800 lg:px-8 lg:pb-16 lg:pt-8 xl:pb-24">
+                  <main>{children}</main>
+                  <DocsFooter />
+                </div>
+                <div className="right-0 hidden w-64 flex-none pl-8 xl:block xl:text-sm">
+                  <div className="sticky top-20 flex h-[calc(100vh-5rem)] flex-col justify-between overflow-y-auto pb-6">
+                    <div className="mb-8">
+                      <h4 className="my-4 pl-2.5 text-sm font-semibold uppercase tracking-wide text-gray-900 dark:text-white">
+                        On this page
+                      </h4>
+                      <nav id="visible-table-of-contents">
+                        <ul dangerouslySetInnerHTML={{ __html: tableOfContents }} />
+                      </nav>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
           </div>
         </div>
-      </main>
+      </div>
     </Flowbite>
   );
 };
@@ -90,7 +88,7 @@ const DocsNavbar: FC<DocsLayoutState> = ({ isCollapsed, setCollapsed }) => {
     <Navbar
       fluid
       theme={{
-        base: 'sticky top-0 z-40 bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-400 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between w-full mx-auto py-2.5 px-4',
+        base: 'sticky top-0 z-[60] bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-400 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between w-full mx-auto py-2.5 px-4',
         inner: {
           base: 'mx-auto flex flex-wrap justify-between items-center w-full',
         },
@@ -146,7 +144,7 @@ const DocsSidebar: FC<DocsLayoutState> = ({ isCollapsed, setCollapsed }) => {
     <>
       <div
         className={twMerge(
-          'fixed inset-0 z-30 h-full w-64 flex-none lg:static lg:block lg:h-auto lg:overflow-y-visible lg:pt-0',
+          'fixed inset-0 z-50 h-full w-64 flex-none lg:static lg:block lg:h-auto lg:overflow-y-visible lg:pt-0',
           isCollapsed && 'hidden',
         )}
       >
@@ -156,7 +154,7 @@ const DocsSidebar: FC<DocsLayoutState> = ({ isCollapsed, setCollapsed }) => {
             root: {
               base: 'h-full border-r border-gray-200 dark:border-gray-600',
               inner:
-                'overflow-y-auto px-4 pt-20 lg:pt-0 h-full bg-white scrolling-touch max-w-2xs lg:h-[calc(100vh-8rem)] lg:block dark:bg-gray-900 lg:mr-0 lg:sticky top-20 font-normal text-base lg:text-sm',
+                'overflow-y-auto px-4 pt-20 lg:pt-0 h-full bg-white scrolling-touch max-w-2xs lg:h-[calc(100vh-8rem)] lg:block dark:bg-gray-900 dark:hover:bg-transparent lg:mr-0 lg:sticky top-20 font-normal text-base lg:text-sm',
             },
           }}
         >
@@ -166,14 +164,14 @@ const DocsSidebar: FC<DocsLayoutState> = ({ isCollapsed, setCollapsed }) => {
                 <Accordion.Title
                   theme={{
                     open: {
-                      on: 'mb-2 text-primary-700 hover:text-primary-700 dark:text-primary-300 dark:hover:text-primary-200',
-                      off: 'mb-1 text-gray-900 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-200',
+                      on: 'mb-2 text-primary-700 hover:text-primary-700 dark:text-primary-500 dark:hover:text-primary-500',
+                      off: 'mb-1 text-gray-900 dark:text-white hover:text-primary-700 dark:hover:text-primary-500',
                     },
                   }}
                   className={twMerge(
                     'flex w-full items-center justify-between bg-transparent p-0 text-sm font-semibold uppercase tracking-wide',
                     pathname.includes('/getting-started/') &&
-                      'text-primary-700 hover:text-primary-700 dark:text-primary-300 dark:hover:text-primary-200',
+                      'text-primary-700 hover:text-primary-700 dark:text-primary-500 dark:hover:text-primary-500',
                   )}
                 >
                   Getting started
@@ -203,14 +201,14 @@ const DocsSidebar: FC<DocsLayoutState> = ({ isCollapsed, setCollapsed }) => {
                 <Accordion.Title
                   theme={{
                     open: {
-                      on: 'mb-2 text-primary-700 hover:text-primary-700 dark:text-primary-300 dark:hover:text-primary-200',
-                      off: 'mb-1 text-gray-900 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-200',
+                      on: 'mb-2 text-primary-700 hover:text-primary-700 dark:text-primary-500 dark:hover:text-primary-500',
+                      off: 'mb-1 text-gray-900 dark:text-white hover:text-primary-700 dark:hover:text-primary-500',
                     },
                   }}
                   className={twMerge(
                     'flex w-full items-center justify-between bg-transparent p-0 text-sm font-semibold uppercase tracking-wide',
                     pathname.includes('/customize/') &&
-                      'text-primary-700 hover:text-primary-700 dark:text-primary-300 dark:hover:text-primary-200',
+                      'text-primary-700 hover:text-primary-700 dark:text-primary-500 dark:hover:text-primary-500',
                   )}
                 >
                   Customize
@@ -228,14 +226,14 @@ const DocsSidebar: FC<DocsLayoutState> = ({ isCollapsed, setCollapsed }) => {
                 <Accordion.Title
                   theme={{
                     open: {
-                      on: 'mb-2 text-primary-700 hover:text-primary-700 dark:text-primary-300 dark:hover:text-primary-200',
-                      off: 'mb-1 text-gray-900 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-200',
+                      on: 'mb-2 text-primary-700 hover:text-primary-700 dark:text-primary-500 dark:hover:text-primary-500',
+                      off: 'mb-1 text-gray-900 dark:text-white hover:text-primary-700 dark:hover:text-primary-500',
                     },
                   }}
                   className={twMerge(
                     'flex w-full items-center justify-between bg-transparent p-0 text-sm font-semibold uppercase tracking-wide',
                     pathname.includes('/components/') &&
-                      'text-primary-700 hover:text-primary-700 dark:text-primary-300 dark:hover:text-primary-200',
+                      'text-primary-700 hover:text-primary-700 dark:text-primary-500 dark:hover:text-primary-500',
                   )}
                 >
                   Components
@@ -280,7 +278,7 @@ const DocsSidebar: FC<DocsLayoutState> = ({ isCollapsed, setCollapsed }) => {
         <div
           onClick={() => setCollapsed(true)}
           onKeyUp={(key) => key.code === 'Escape' && setCollapsed(true)}
-          className="fixed inset-0 z-20 bg-gray-900/50 dark:bg-gray-900/60 lg:hidden"
+          className="fixed inset-0 z-40 bg-gray-900/50 dark:bg-gray-900/60 lg:hidden"
         />
       )}
     </>
@@ -295,10 +293,10 @@ const SidebarLink: FC<PropsWithChildren & { href: string }> = ({ children, href 
       as={Link}
       href={href}
       className={twMerge(
-        'p-0 font-medium transition-all hover:bg-transparent lg:text-sm [&>*]:px-0',
+        'p-0 font-medium transition-all hover:bg-transparent dark:hover:bg-transparent lg:text-sm [&>*]:px-0',
         pathname === href
-          ? 'text-primary-700 hover:text-primary-800 dark:text-primary-200'
-          : 'text-gray-500 hover:text-gray-900 dark:hover:text-gray-200',
+          ? 'text-primary-700 hover:text-primary-700 dark:text-primary-500'
+          : 'text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white',
       )}
     >
       {children}
