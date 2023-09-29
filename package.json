@@ -1,6 +1,6 @@
 {
   "name": "@transkripid/flowbite-react",
-  "version": "0.6.1",
+  "version": "0.6.2",
   "sideEffects": false,
   "description": "Official React components built for Flowbite and Tailwind CSS - Transkrip.id fork",
   "keywords": [
