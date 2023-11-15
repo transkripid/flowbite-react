@@ -15,6 +15,7 @@ export interface FlowbiteDropdownItemTheme {
 }
 
 export type DropdownItemProps<T extends ElementType = 'button'> = {
+  // TODO: make it work with `Link` from Next.js
   as?: T;
   href?: string;
   icon?: FC<ComponentProps<'svg'>>;
@@ -31,9 +32,9 @@ export const DropdownItem = <T extends ElementType = 'button'>({
   ...props
 }: DropdownItemProps<T>) => {
   const { ref, index } = useListItem({ label: typeof children === 'string' ? children : undefined });
-  const { theme: dropdownTheme, activeIndex, dismissOnClick, getItemProps, handleSelect } = useDropdownContext();
+  const { theme: rootTheme, activeIndex, dismissOnClick, getItemProps, handleSelect } = useDropdownContext();
   const isActive = activeIndex === index;
-  const theme = mergeDeep(dropdownTheme?.floating?.item ?? {}, customTheme);
+  const theme = mergeDeep(rootTheme.floating.item, customTheme);
 
   const theirProps = props as ButtonBaseProps<T>;
 
