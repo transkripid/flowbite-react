@@ -16,6 +16,7 @@ export interface FlowbiteListRootTheme {
     on: string;
     off: string;
   };
+  horizontal: string;
   unstyled: string;
   nested: string;
 }
@@ -30,19 +31,30 @@ export interface ListProps extends PropsWithChildren<ComponentProps<'ul'> & Comp
   ordered?: boolean;
   unstyled?: boolean;
   nested?: boolean;
+  horizontal?: boolean;
 }
 
-const ListComponent: FC<ListProps> = ({ children, className, theme: customTheme = {}, ...props }) => {
+const ListComponent: FC<ListProps> = ({
+  children,
+  className,
+  unstyled,
+  nested,
+  ordered,
+  horizontal,
+  theme: customTheme = {},
+  ...props
+}) => {
   const theme = mergeDeep(getTheme().list, customTheme);
-  const Component = props.ordered ? 'ol' : 'ul';
+  const Component = ordered ? 'ol' : 'ul';
 
   return (
     <Component
       className={twMerge(
-        theme.root.ordered[props.ordered ? 'on' : 'off'],
-        props.unstyled && theme.root.unstyled,
-        props.nested && theme.root.nested,
         theme.root.base,
+        theme.root.ordered[ordered ? 'on' : 'off'],
+        unstyled && theme.root.unstyled,
+        nested && theme.root.nested,
+        horizontal && theme.root.horizontal,
         className,
       )}
       {...props}

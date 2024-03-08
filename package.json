@@ -1,6 +1,6 @@
 {
   "name": "@transkripid/flowbite-react",
-  "version": "0.6.4-p5",
+  "version": "0.7.2",
   "sideEffects": false,
   "description": "Official React components built for Flowbite and Tailwind CSS - Transkrip.id fork",
   "keywords": [
@@ -61,7 +61,6 @@
   },
   "devDependencies": {
     "@docsearch/react": "^3.5.2",
-    "@mapbox/rehype-prism": "^0.9.0",
     "@storybook/addon-a11y": "^7.5.3",
     "@storybook/addon-actions": "^7.5.3",
     "@storybook/addon-docs": "^7.5.3",
@@ -122,6 +121,7 @@
     "react-dom": "^18.2.0",
     "react-markdown": "^9.0.1",
     "rehype-autolink-headings": "^7.1.0",
+    "rehype-prism-plus": "^1.6.3",
     "rehype-slug": "^6.0.0",
     "resize-observer-polyfill": "^1.5.1",
     "sharp": "^0.32.6",

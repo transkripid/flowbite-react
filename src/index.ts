@@ -20,8 +20,8 @@ export * from './components/Footer';
 export * from './components/HelperText';
 export * from './components/Kbd';
 export * from './components/Label';
-export * from './components/ListGroup';
 export * from './components/List';
+export * from './components/ListGroup';
 export * from './components/Modal';
 export * from './components/Navbar';
 export * from './components/Pagination';
@@ -41,6 +41,7 @@ export * from './components/Timeline';
 export * from './components/Toast';
 export * from './components/ToggleSwitch';
 export * from './components/Tooltip';
+export * from './components/Popover';
 
 export * from './hooks/use-theme-mode';
 
