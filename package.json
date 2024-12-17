@@ -1,6 +1,6 @@
 {
   "name": "@transkripid/flowbite-react",
-  "version": "0.7.2",
+  "version": "0.7.4-compiled",
   "sideEffects": false,
   "description": "Official React components built for Flowbite and Tailwind CSS - Transkrip.id fork",
   "keywords": [
@@ -26,14 +26,11 @@
     "url": "https://github.com/transkripid/flowbite-react"
   },
   "scripts": {
-    "build": "next build",
-    "build:lib": "vite build",
+    "build": "vite build",
     "commit": "cz",
-    "cypress:open": "cypress open",
-    "cypress:run": "cypress run",
     "dev": "next dev",
     "lint": "eslint --color .",
-    "prepublishOnly": "yarn build:lib",
+    "prepublishOnly": "yarn build",
     "prettier": "prettier --check .",
     "prettier:fix": "prettier --write .",
     "release": "standard-version -a",
@@ -43,8 +40,6 @@
     "test": "vitest",
     "test:coverage": "vitest run --coverage",
     "test:open": "vitest --ui",
-    "test:e2e": "start-test 3000 cypress:run",
-    "test:e2e:open": "start-test 3000 cypress:open",
     "typecheck": "tsc --noEmit"
   },
   "config": {
@@ -86,8 +81,8 @@
     "@testing-library/user-event": "^14.5.1",
     "@types/node": "^20.9.0",
     "@types/prismjs": "^1.26.3",
-    "@types/react": "^18.2.37",
-    "@types/react-dom": "^18.2.15",
+    "@types/react": "^19.0.1",
+    "@types/react-dom": "^19.0.2",
     "@types/react-syntax-highlighter": "^15.5.10",
     "@typescript-eslint/eslint-plugin": "^6.10.0",
     "@typescript-eslint/parser": "^6.10.0",
@@ -96,35 +91,22 @@
     "@vitest/ui": "^0.34.6",
     "autoprefixer": "^10.4.16",
     "axe-core": "^4.8.2",
+    "babel-plugin-react-compiler": "^19.0.0-beta-201e55d-20241215",
     "commitizen": "^4.3.0",
-    "contentlayer": "^0.3.4",
-    "cypress": "^13.4.0",
-    "cypress-axe": "^1.5.0",
     "cz-conventional-changelog": "3.3.0",
     "eslint": "^8.53.0",
     "eslint-config-next": "^14.0.1",
     "eslint-plugin-jsx-a11y": "^6.8.0",
     "eslint-plugin-react": "^7.33.2",
+    "eslint-plugin-react-compiler": "^19.0.0-beta-201e55d-20241215",
     "eslint-plugin-react-hooks": "^4.6.0",
     "eslint-plugin-storybook": "^0.6.15",
-    "fathom-client": "^3.6.0",
-    "jsdom": "^22.1.0",
-    "markdown-toc": "^1.2.0",
-    "next": "^14.0.1",
-    "next-contentlayer": "^0.3.4",
     "postcss": "^8.4.31",
     "prettier": "^3.0.3",
     "prettier-plugin-organize-imports": "^3.2.3",
     "prettier-plugin-tailwindcss": "^0.5.6",
-    "prismjs": "^1.29.0",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
-    "react-markdown": "^9.0.1",
-    "rehype-autolink-headings": "^7.1.0",
-    "rehype-prism-plus": "^1.6.3",
-    "rehype-slug": "^6.0.0",
-    "resize-observer-polyfill": "^1.5.1",
-    "sharp": "^0.32.6",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
     "standard-version": "^9.5.0",
     "start-server-and-test": "^2.0.2",
     "storybook": "^7.5.3",
@@ -139,8 +121,8 @@
     "vitest": "^0.34.6"
   },
   "peerDependencies": {
-    "react": "^18",
-    "react-dom": "^18",
+    "react": "^19",
+    "react-dom": "^19",
     "tailwindcss": "^3"
   },
   "resolutions": {
@@ -190,5 +172,6 @@
       "jsx-a11y/anchor-is-valid": "off",
       "react/no-unescaped-entities": "off"
     }
-  }
+  },
+  "packageManager": "yarn@1.22.22+sha1.ac34549e6aa8e7ead463a7407e1c7390f61a6610"
 }

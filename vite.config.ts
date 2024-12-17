@@ -24,10 +24,18 @@ function cleanImagesDir() {
 
 export default defineConfig({
   plugins: [
-    react(),
+    react({
+      babel: {
+        plugins: [
+          'babel-plugin-react-compiler',
+        ],
+      },
+    }),
     tsconfigPaths({
       projects: [resolve(__dirname, 'tsconfig.lib.json')],
     }),
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-expect-error
     dts({
       include: ['./src/'],
     }),
@@ -50,6 +58,7 @@ export default defineConfig({
       external: [
         ...Object.keys(pkg.dependencies),
         ...Object.keys(pkg.peerDependencies),
+        'react/compiler-runtime',
         'react/jsx-runtime',
         /react-icons/
       ],
